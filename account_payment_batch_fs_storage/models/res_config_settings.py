@@ -3,12 +3,11 @@
 
 import ast
 
-from odoo import Command, _, api, fields, models
+from odoo import Command, api, fields, models
 from odoo.exceptions import UserError
 
 
 class ResConfigSettings(models.TransientModel):
-
     _inherit = "res.config.settings"
 
     fs_storage_source_payment = fields.Selection(
@@ -26,8 +25,7 @@ class ResConfigSettings(models.TransientModel):
             self.env["ir.config_parameter"]
             .sudo()
             .get_param(
-                "account_payment_batch_fs_storage"
-                f".fs_storage_ids_{self.env.company.id}"
+                f"account_payment_batch_fs_storage.fs_storage_ids_{self.env.company.id}"
             )
         )
         res.update(
@@ -50,19 +48,20 @@ class ResConfigSettings(models.TransientModel):
         fs_storage_source = self.fs_storage_source_payment
         if fs_storage_source == "method_line":
             used_storages = (
-                self.env["account.payment.method.line"].search([]).mapped("storage")
+                self.env["account.payment.method.line"].search([]).mapped("storage")  # pylint: disable=no-search-all
             )
         else:
             used_storages = (
-                self.env["account.payment.method"].search([]).mapped("storage")
+                self.env["account.payment.method"].search([]).mapped("storage")  # pylint: disable=no-search-all
             )
         if any(used_storages):
             ids = [int(storage_id) for storage_id in used_storages if storage_id]
             allowed_storages = self.fs_storage_ids
             if not set(allowed_storages.ids).issuperset(ids):
                 raise UserError(
-                    _(
-                        "Storage is already used on at least one payment %(source)s",
-                        source=fs_storage_source,
+                    self.env._(
+                        "Storage is already used on at least "
+                        "one payment %(payment_source)s",
+                        payment_source=fs_storage_source,
                     )
                 )

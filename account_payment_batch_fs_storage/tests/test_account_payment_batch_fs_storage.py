@@ -4,7 +4,6 @@ from contextlib import contextmanager
 from datetime import date
 from unittest.mock import patch
 
-from odoo import _
 from odoo.exceptions import UserError
 from odoo.tests import tagged
 
@@ -35,13 +34,15 @@ class TestAccountPaymentBatchFsStorage(AccountTestInvoicingCommon):
             }
         )
 
-        cls.payment_method = cls.env.ref(
-            "account.account_payment_method_manual_out"
-        ).sudo().copy(
-            {
-                "name": "method test",
-                "code": "test",
-            }
+        cls.payment_method = (
+            cls.env.ref("account.account_payment_method_manual_out")
+            .sudo()
+            .copy(
+                {
+                    "name": "method test",
+                    "code": "test",
+                }
+            )
         )
 
         cls.bank_journal = cls.company_data["default_journal_bank"]
@@ -84,7 +85,7 @@ class TestAccountPaymentBatchFsStorage(AccountTestInvoicingCommon):
     @contextmanager
     def with_raise_error_while_exporting(self):
         def dummy_raise():
-            raise UserError(_("Error"))
+            raise UserError(self.env._("Error"))
 
         path = (
             "odoo.addons.account_payment_batch_fs_storage.models"
@@ -135,7 +136,8 @@ class TestAccountPaymentBatchFsStorage(AccountTestInvoicingCommon):
                 "params": {
                     "type": "success",
                     "title": "Generate and export",
-                    "message": "The file has been scheduled to be dropped on the storage.",
+                    "message": "The file has been scheduled to be dropped "
+                    "on the storage.",
                     "sticky": True,
                     "next": {"type": "ir.actions.client", "tag": "reload"},
                 },
@@ -188,7 +190,8 @@ class TestAccountPaymentBatchFsStorage(AccountTestInvoicingCommon):
                 "params": {
                     "type": "success",
                     "title": "Generate and export",
-                    "message": "The file has been scheduled to be dropped on the storage.",
+                    "message": "The file has been scheduled to be dropped "
+                    "on the storage.",
                     "sticky": True,
                     "next": {"type": "ir.actions.client", "tag": "reload"},
                 },
@@ -219,7 +222,8 @@ class TestAccountPaymentBatchFsStorage(AccountTestInvoicingCommon):
                 "params": {
                     "type": "success",
                     "title": "Generate and export",
-                    "message": "The file has been scheduled to be dropped on the storage.",
+                    "message": "The file has been scheduled to be dropped "
+                    "on the storage.",
                     "sticky": True,
                     "next": {"type": "ir.actions.client", "tag": "reload"},
                 },

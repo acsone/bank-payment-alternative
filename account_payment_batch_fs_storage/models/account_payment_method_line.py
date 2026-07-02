@@ -3,11 +3,10 @@
 
 import ast
 
-from odoo import _, fields, models
+from odoo import fields, models
 
 
 class AccountPaymentMethodLine(models.Model):
-
     _inherit = "account.payment.method.line"
 
     storage = fields.Selection(
@@ -31,11 +30,12 @@ class AccountPaymentMethodLine(models.Model):
                 storages = self.env["fs.storage"].browse(ast.literal_eval(ids))
                 return [(str(r.id), r.display_name) for r in storages]
         else:
-            storages = self.env["fs.storage"].search([])
+            storages = self.env["fs.storage"].search([])  # pylint: disable=no-search-all
             return [
                 (
                     str(r.id),
-                    r.display_name + _(" - disabled in method payment setting"),
+                    r.display_name
+                    + self.env._(" - disabled in method payment setting"),
                 )
                 for r in storages
             ]
